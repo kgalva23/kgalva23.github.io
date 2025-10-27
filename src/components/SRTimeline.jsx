@@ -21,6 +21,8 @@ function humanDur(ms) {
 }
 
 const MILESTONES = [
+  { day: 7, label: "Day 7", copy: "Feeling jittery, slowly withdrawing from the habit of masturbating. You've gone a week retaining your seed, keep going." },
+  { day: 15, label: "Day 15", copy: "Halfway through the month, urges are peaking during this time. You must transmute this sexual energy into creative and physical outlets: creating videos, working out, etc." },
   { day: 30, label: "Day 30", copy: "Feeling more confident, can think more clearly, feel bigger, more female attention? Higher focus on goals and less on lust and surface level things." },
   { day: 60, label: "Day 60", copy: "Feeling like a superhero, can think and process things faster. Gaining muscle and looking bigger? Feeling more like a man and less like a cuck." },
   { day: 90, label: "Day 90", copy: "3 months on the journey, wow nice job. Good fortunes, face clear, feel better, energized, optimistic, active." },
