@@ -65,6 +65,7 @@ export default function Calendar2026() {
     // blank default, colored on selection
     if (status === "green") return "bg-emerald-500 text-white border-emerald-600/60";
     if (status === "red") return "bg-red-500 text-white border-red-600/60";
+    if (status === "yellow") return "bg-yellow-400 text-white border-yellow-600/60";
     return "bg-white/70 dark:bg-gray-900/40 text-gray-800 dark:text-gray-100 border-gray-300/60 dark:border-gray-700/60";
   }
 
@@ -96,6 +97,17 @@ export default function Calendar2026() {
             onClick={() => setPaint("red")}
           >
             Red
+          </button>
+
+          <button
+            className={`px-3 py-1.5 rounded-md border text-sm transition ${
+              paint === "yellow"
+                ? "bg-yellow-400 text-white border-yellow-700"
+                : "bg-transparent border-gray-300 dark:border-gray-600 hover:bg-gray-100/60 dark:hover:bg-gray-900/40"
+            }`}
+            onClick={() => setPaint("yellow")}
+          >
+            Yellow
           </button>
 
           <button
