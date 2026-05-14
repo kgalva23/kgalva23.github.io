@@ -1,10 +1,10 @@
 import React from "react";
 
-// 2026 calendar with click-to-color (Green/Red/Erase) and localStorage persistence
+// 2026 calendar with click-to-color
 const YEAR = 2026;
-const LS_KEY = "sr_calendar_2026_v1"; // change if you ever want to reset everyone’s data
 
 const DOW = ["S", "M", "T", "W", "T", "F", "S"];
+
 const MONTH_NAMES = [
   "January", "February", "March",
   "April", "May", "June",
@@ -13,59 +13,58 @@ const MONTH_NAMES = [
 ];
 
 // helpers
-function pad2(n) { return String(n).padStart(2, "0"); }
+function pad2(n) {
+  return String(n).padStart(2, "0");
+}
+
 function isoDate(y, mIndex, d) {
   return `${y}-${pad2(mIndex + 1)}-${pad2(d)}`;
 }
+
 function daysInMonth(y, mIndex) {
   return new Date(y, mIndex + 1, 0).getDate();
 }
+
 function firstDow(y, mIndex) {
   return new Date(y, mIndex, 1).getDay(); // 0=Sun
 }
 
-function loadMap() {
-  try {
-    const raw = localStorage.getItem(LS_KEY);
-    return raw ? JSON.parse(raw) : {};
-  } catch {
-    return {};
-  }
-}
-function saveMap(map) {
-  localStorage.setItem(LS_KEY, JSON.stringify(map));
-}
-
-export default function Calendar2026() {
-  const [paint, setPaint] = React.useState("green"); // "green" | "red" | "erase"
-  const [map, setMap] = React.useState(() => (typeof window !== "undefined" ? loadMap() : {}));
-
-  React.useEffect(() => {
-    saveMap(map);
-  }, [map]);
+export default function Calendar2026({ dayColors, setDayColors }) {
+  const [paint, setPaint] = React.useState("green"); 
+  // "green" | "red" | "yellow" | "erase"
 
   function applyColor(dateISO) {
-    setMap(prev => {
+    setDayColors((prev) => {
       const next = { ...prev };
+
       if (paint === "erase") {
         delete next[dateISO];
       } else {
-        next[dateISO] = paint; // "green" or "red"
+        next[dateISO] = paint;
       }
+
       return next;
     });
   }
 
   function clearAll() {
     if (!confirm("Clear all 2026 calendar colors?")) return;
-    setMap({});
+    setDayColors({});
   }
 
   function cellClasses(status) {
-    // blank default, colored on selection
-    if (status === "green") return "bg-emerald-500 text-white border-emerald-600/60";
-    if (status === "red") return "bg-red-500 text-white border-red-600/60";
-    if (status === "yellow") return "bg-yellow-400 text-white border-yellow-600/60";
+    if (status === "green") {
+      return "bg-emerald-500 text-white border-emerald-600/60";
+    }
+
+    if (status === "red") {
+      return "bg-red-500 text-white border-red-600/60";
+    }
+
+    if (status === "yellow") {
+      return "bg-yellow-400 text-black border-yellow-600/60";
+    }
+
     return "bg-white/70 dark:bg-gray-900/40 text-gray-800 dark:text-gray-100 border-gray-300/60 dark:border-gray-700/60";
   }
 
@@ -102,7 +101,7 @@ export default function Calendar2026() {
           <button
             className={`px-3 py-1.5 rounded-md border text-sm transition ${
               paint === "yellow"
-                ? "bg-yellow-400 text-white border-yellow-700"
+                ? "bg-yellow-400 text-black border-yellow-700"
                 : "bg-transparent border-gray-300 dark:border-gray-600 hover:bg-gray-100/60 dark:hover:bg-gray-900/40"
             }`}
             onClick={() => setPaint("yellow")}
@@ -134,37 +133,42 @@ export default function Calendar2026() {
       <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
         {MONTH_NAMES.map((name, mIndex) => {
           const dim = daysInMonth(YEAR, mIndex);
-          const offset = firstDow(YEAR, mIndex); // blanks before day 1
+          const offset = firstDow(YEAR, mIndex);
 
-          // build 42 cells (6 weeks x 7 days), like typical calendar blocks
           const cells = [];
+
           for (let i = 0; i < 42; i++) {
             const dayNum = i - offset + 1;
+
             if (dayNum < 1 || dayNum > dim) {
               cells.push({ kind: "empty", key: `e-${mIndex}-${i}` });
             } else {
               const dateISO = isoDate(YEAR, mIndex, dayNum);
+
               cells.push({
                 kind: "day",
                 key: dateISO,
                 dayNum,
                 dateISO,
-                status: map[dateISO], // "green" | "red" | undefined
+                status: dayColors[dateISO],
               });
             }
           }
 
           return (
-            <div key={name} className="rounded-xl border border-gray-200/70 dark:border-gray-700/70 overflow-hidden">
+            <div
+              key={name}
+              className="rounded-xl border border-gray-200/70 dark:border-gray-700/70 overflow-hidden"
+            >
               <div className="px-3 py-2 text-center font-semibold bg-gray-100/70 dark:bg-gray-900/50">
                 {name} {YEAR}
               </div>
 
               {/* day-of-week header */}
               <div className="grid grid-cols-7 text-xs font-semibold">
-                {DOW.map((d) => (
+                {DOW.map((d, index) => (
                   <div
-                    key={d}
+                    key={`${d}-${index}`}
                     className="py-1 text-center border-t border-b border-gray-200/70 dark:border-gray-700/70 bg-white/60 dark:bg-gray-900/30"
                   >
                     {d}
@@ -196,7 +200,6 @@ export default function Calendar2026() {
                         cellClasses(cell.status),
                       ].join(" ")}
                     >
-                      {/* If you truly want numbers hidden, replace {cell.dayNum} with "" */}
                       {cell.dayNum}
                     </button>
                   );
